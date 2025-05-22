@@ -15,7 +15,7 @@ class DriveApiError extends Error {
 
 export class DriveAPI {
   private static instance: DriveAPI;
-  
+
   static getInstance(): DriveAPI {
     if (!DriveAPI.instance) {
       DriveAPI.instance = new DriveAPI();
@@ -23,8 +23,33 @@ export class DriveAPI {
     return DriveAPI.instance;
   }
 
+  // Initialize Google API client
+  private async initializeGapi(): Promise<void> {
+    const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+    const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    if (!API_KEY || !CLIENT_ID) {
+      throw new DriveApiError('Google API key or Client ID is missing');
+    }
+
+    return new Promise((resolve, reject) => {
+      window.gapi.load('client:auth2', () => {
+        window.gapi.client
+          .init({
+            apiKey: API_KEY,
+            clientId: CLIENT_ID,
+            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+            scope: 'https://www.googleapis.com/auth/drive',
+          })
+          .then(() => resolve())
+          .catch((error: any) => reject(new DriveApiError('Failed to initialize GAPI', error.status)));
+      });
+    });
+  }
+
   private async makeRequest(request: any): Promise<any> {
     try {
+      await this.initializeGapi(); // Ensure GAPI is initialized before requests
       const response = await request;
       return response.result;
     } catch (error: any) {
@@ -43,10 +68,10 @@ export class DriveAPI {
     pageToken?: string;
   } = {}): Promise<{ files: DriveFile[]; nextPageToken?: string }> {
     const {
-      query = "trashed=false",
+      query = 'trashed=false',
       maxResults = 100,
       orderBy = 'modifiedTime desc',
-      pageToken
+      pageToken,
     } = options;
 
     const request = window.gapi.client.drive.files.list({
@@ -54,13 +79,13 @@ export class DriveAPI {
       pageSize: maxResults,
       orderBy,
       pageToken,
-      fields: 'nextPageToken, files(id, name, mimeType, size, modifiedTime, starred, webViewLink, webContentLink, thumbnailLink, parents, owners)'
+      fields: 'nextPageToken, files(id, name, mimeType, size, modifiedTime, starred, webViewLink, webContentLink, thumbnailLink, parents, owners)',
     });
 
     const result = await this.makeRequest(request);
     return {
       files: result.files || [],
-      nextPageToken: result.nextPageToken
+      nextPageToken: result.nextPageToken,
     };
   }
 
@@ -71,15 +96,15 @@ export class DriveAPI {
   }
 
   async getFavoriteFiles(): Promise<DriveFile[]> {
-    const query = "starred=true and trashed=false";
+    const query = 'starred=true and trashed=false';
     const result = await this.listFiles({ query });
     return result.files;
   }
 
   async getRecentFiles(limit: number = 10): Promise<DriveFile[]> {
-    const result = await this.listFiles({ 
+    const result = await this.listFiles({
       maxResults: limit,
-      orderBy: 'modifiedTime desc'
+      orderBy: 'modifiedTime desc',
     });
     return result.files;
   }
@@ -93,7 +118,7 @@ export class DriveAPI {
   async getFile(fileId: string): Promise<DriveFile> {
     const request = window.gapi.client.drive.files.get({
       fileId,
-      fields: 'id, name, mimeType, size, modifiedTime, starred, webViewLink, webContentLink, thumbnailLink, parents, owners'
+      fields: 'id, name, mimeType, size, modifiedTime, starred, webViewLink, webContentLink, thumbnailLink, parents, owners',
     });
 
     return await this.makeRequest(request);
@@ -102,7 +127,7 @@ export class DriveAPI {
   async updateFile(fileId: string, updates: Partial<DriveFile>): Promise<DriveFile> {
     const request = window.gapi.client.drive.files.update({
       fileId,
-      resource: updates
+      resource: updates,
     });
 
     return await this.makeRequest(request);
@@ -114,25 +139,22 @@ export class DriveAPI {
 
   async deleteFile(fileId: string): Promise<void> {
     const request = window.gapi.client.drive.files.delete({
-      fileId
+      fileId,
     });
 
     await this.makeRequest(request);
   }
 
   async createShareLink(fileId: string): Promise<string> {
-    // First, update the file to be shareable
     const permissionRequest = window.gapi.client.drive.permissions.create({
       fileId,
       resource: {
         role: 'reader',
-        type: 'anyone'
-      }
+        type: 'anyone',
+      },
     });
 
     await this.makeRequest(permissionRequest);
-
-    // Get the updated file with the share link
     const file = await this.getFile(fileId);
     return file.webViewLink || '';
   }
@@ -140,12 +162,12 @@ export class DriveAPI {
   async uploadFile(file: File, onProgress?: (progress: number) => void): Promise<DriveFile> {
     return new Promise((resolve, reject) => {
       const boundary = '-------314159265358979323846';
-      const delimiter = "\r\n--" + boundary + "\r\n";
-      const close_delim = "\r\n--" + boundary + "--";
+      const delimiter = '\r\n--' + boundary + '\r\n';
+      const close_delim = '\r\n--' + boundary + '--';
 
       const metadata = {
-        'name': file.name,
-        'parents': ['root']
+        name: file.name,
+        parents: ['root'],
       };
 
       const multipartRequestBody =
@@ -153,11 +175,16 @@ export class DriveAPI {
         'Content-Type: application/json\r\n\r\n' +
         JSON.stringify(metadata) +
         delimiter +
-        'Content-Type: ' + file.type + '\r\n\r\n';
+        'Content-Type: ' +
+        file.type +
+        '\r\n\r\n';
 
       const request = new XMLHttpRequest();
       request.open('POST', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart');
-      request.setRequestHeader('Authorization', 'Bearer ' + window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
+      request.setRequestHeader(
+        'Authorization',
+        'Bearer ' + window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token
+      );
       request.setRequestHeader('Content-Type', 'multipart/related; boundary="' + boundary + '"');
 
       request.upload.addEventListener('progress', (e) => {
@@ -194,8 +221,8 @@ export class DriveAPI {
       resource: {
         name,
         mimeType: 'application/vnd.google-apps.folder',
-        parents: [parentId]
-      }
+        parents: [parentId],
+      },
     });
 
     return await this.makeRequest(request);
@@ -204,15 +231,15 @@ export class DriveAPI {
   async getStorageQuota(): Promise<{ usage: number; limit: number }> {
     try {
       const request = window.gapi.client.drive.about.get({
-        fields: 'storageQuota'
+        fields: 'storageQuota',
       });
 
       const result = await this.makeRequest(request);
       const quota = result.storageQuota;
-      
+
       return {
         usage: parseInt(quota.usage || '0'),
-        limit: parseInt(quota.limit || '15000000000') // Default 15GB
+        limit: parseInt(quota.limit || '15000000000'), // Default 15GB
       };
     } catch (error) {
       console.error('Failed to get storage quota:', error);
