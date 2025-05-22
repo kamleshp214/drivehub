@@ -3,21 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>DriveHub - Google Drive File Manager</title>
-    <meta name="description" content="Modern Google Drive file manager with responsive design, dark mode, and advanced file organization features.">
+    <title>DriveHub - Professional Google Drive File Manager</title>
+    <meta name="description" content="Modern, responsive Google Drive file manager with dark mode, file preview, drag-and-drop uploads, and advanced organization features. Built with React and optimized for all devices.">
+    <meta name="keywords" content="Google Drive, file manager, cloud storage, file organization, drag and drop, responsive design">
+    <meta name="author" content="DriveHub">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://drivehub.vercel.app/">
+    <meta property="og:title" content="DriveHub - Professional Google Drive File Manager">
+    <meta property="og:description" content="Modern, responsive Google Drive file manager with dark mode, file preview, and advanced organization features.">
+    <meta property="og:image" content="/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://drivehub.vercel.app/">
+    <meta property="twitter:title" content="DriveHub - Professional Google Drive File Manager">
+    <meta property="twitter:description" content="Modern, responsive Google Drive file manager with dark mode, file preview, and advanced organization features.">
+    <meta property="twitter:image" content="/og-image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1d4ed8" />
     
     <!-- Google APIs -->
-    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Performance optimizations -->
+    <link rel="dns-prefetch" href="//apis.google.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
   </head>
   <body>
+    <noscript>
+      <div style="text-align: center; padding: 2rem; font-family: Inter, sans-serif;">
+        <h1>JavaScript Required</h1>
+        <p>DriveHub requires JavaScript to function properly. Please enable JavaScript in your browser and refresh the page.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
 </html>
