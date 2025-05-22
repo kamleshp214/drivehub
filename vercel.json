@@ -3,8 +3,8 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "env": {
-    "VITE_GOOGLE_API_KEY": "@google_api_key",
-    "VITE_GOOGLE_CLIENT_ID": "@google_client_id"
+    "VITE_GOOGLE_API_KEY": "AIzaSyDhAp75fy9MmuH-u6AFOYbjWVRTWOi3X0U",
+    "VITE_GOOGLE_CLIENT_ID": "372157919344-pb1bl06j8m33vmp4ae7d32pjjdmjnvos.apps.googleusercontent.com"
   },
   "functions": {
     "app/api/**/*.js": {
