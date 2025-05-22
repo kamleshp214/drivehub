@@ -38,14 +38,14 @@ export default function FileCard({ file, onPreview }: FileCardProps) {
 
   return (
     <div
-      className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md hover:border-google-blue dark:hover:border-google-blue transition-all cursor-pointer"
+      className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 hover:shadow-md hover:border-google-blue dark:hover:border-google-blue transition-all cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleCardClick}
     >
-      <div className="flex flex-col items-center space-y-3">
+      <div className="flex flex-col items-center space-y-2 sm:space-y-3">
         {/* File icon/thumbnail */}
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform ${iconColor}`}>
+        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform ${iconColor}`}>
           {file.mimeType.includes('image') && file.thumbnailLink ? (
             <img
               src={file.thumbnailLink.replace('=s220', '=s96')}
@@ -53,13 +53,13 @@ export default function FileCard({ file, onPreview }: FileCardProps) {
               className="w-full h-full object-cover rounded-xl"
             />
           ) : (
-            <i className={`${getFileIcon(file.mimeType)} text-lg`}></i>
+            <i className={`${getFileIcon(file.mimeType)} text-base sm:text-lg`}></i>
           )}
         </div>
 
         {/* File name */}
         <div className="w-full text-center">
-          <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={file.name}>
+          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate" title={file.name}>
             {file.name}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -67,8 +67,8 @@ export default function FileCard({ file, onPreview }: FileCardProps) {
           </p>
         </div>
 
-        {/* Action buttons (hidden by default, shown on hover) */}
-        <div className={`flex space-x-2 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Action buttons (always visible on mobile, hover on desktop) */}
+        <div className={`flex space-x-1 sm:space-x-2 transition-opacity ${isHovered || window.innerWidth < 640 ? 'opacity-100' : 'opacity-0 sm:opacity-0'}`}>
           <Button
             size="sm"
             variant="ghost"
@@ -76,7 +76,7 @@ export default function FileCard({ file, onPreview }: FileCardProps) {
             onClick={handleDownloadClick}
             title="Download"
           >
-            <Download size={14} />
+            <Download size={12} className="sm:w-3.5 sm:h-3.5" />
           </Button>
           <Button
             size="sm"
@@ -85,7 +85,7 @@ export default function FileCard({ file, onPreview }: FileCardProps) {
             onClick={handleShareClick}
             title="Share"
           >
-            <Share size={14} />
+            <Share size={12} className="sm:w-3.5 sm:h-3.5" />
           </Button>
           <Button
             size="sm"
@@ -98,7 +98,7 @@ export default function FileCard({ file, onPreview }: FileCardProps) {
             onClick={handleStarClick}
             title={file.starred ? 'Remove from favorites' : 'Add to favorites'}
           >
-            {file.starred ? <Star size={14} fill="currentColor" /> : <StarOff size={14} />}
+            {file.starred ? <Star size={12} fill="currentColor" className="sm:w-3.5 sm:h-3.5" /> : <StarOff size={12} className="sm:w-3.5 sm:h-3.5" />}
           </Button>
         </div>
       </div>

@@ -16,32 +16,42 @@ export function useDriveFiles(options: {
   const query = useQuery({
     queryKey,
     queryFn: async () => {
-      if (searchTerm) {
-        return driveApi.searchFiles(searchTerm);
+      // Return empty array if Google API is not ready
+      if (!window.gapi?.client?.drive) {
+        return [];
       }
 
-      let mimeTypeQuery = '';
-      switch (filterBy) {
-        case 'documents':
-          mimeTypeQuery = 'application/vnd.google-apps.document or application/pdf or application/msword';
-          break;
-        case 'images':
-          mimeTypeQuery = 'image/';
-          break;
-        case 'folders':
-          mimeTypeQuery = 'application/vnd.google-apps.folder';
-          break;
+      try {
+        if (searchTerm) {
+          return driveApi.searchFiles(searchTerm);
+        }
+
+        let mimeTypeQuery = '';
+        switch (filterBy) {
+          case 'documents':
+            mimeTypeQuery = 'application/vnd.google-apps.document or application/pdf or application/msword';
+            break;
+          case 'images':
+            mimeTypeQuery = 'image/';
+            break;
+          case 'folders':
+            mimeTypeQuery = 'application/vnd.google-apps.folder';
+            break;
+        }
+
+        const query = mimeTypeQuery ? `(${mimeTypeQuery}) and trashed=false` : 'trashed=false';
+        const orderBy = sortBy === 'modifiedTime' ? 'modifiedTime desc' : 
+                       sortBy === 'name' ? 'name' :
+                       sortBy === 'size' ? 'quotaBytesUsed desc' : 'starred desc, modifiedTime desc';
+
+        const result = await driveApi.listFiles({ query, orderBy });
+        return result.files;
+      } catch (error) {
+        console.warn('Drive API not available:', error);
+        return [];
       }
-
-      const query = mimeTypeQuery ? `(${mimeTypeQuery}) and trashed=false` : 'trashed=false';
-      const orderBy = sortBy === 'modifiedTime' ? 'modifiedTime desc' : 
-                     sortBy === 'name' ? 'name' :
-                     sortBy === 'size' ? 'quotaBytesUsed desc' : 'starred desc, modifiedTime desc';
-
-      const result = await driveApi.listFiles({ query, orderBy });
-      return result.files;
     },
-    enabled: !!window.gapi?.client?.drive,
+    enabled: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -56,8 +66,16 @@ export function useDriveFiles(options: {
 export function useRecentFiles() {
   return useQuery({
     queryKey: ['recentFiles'],
-    queryFn: () => driveApi.getRecentFiles(5),
-    enabled: !!window.gapi?.client?.drive,
+    queryFn: async () => {
+      if (!window.gapi?.client?.drive) return [];
+      try {
+        return await driveApi.getRecentFiles(5);
+      } catch (error) {
+        console.warn('Recent files not available:', error);
+        return [];
+      }
+    },
+    enabled: true,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }
@@ -65,8 +83,16 @@ export function useRecentFiles() {
 export function useFavoriteFiles() {
   return useQuery({
     queryKey: ['favoriteFiles'],
-    queryFn: () => driveApi.getFavoriteFiles(),
-    enabled: !!window.gapi?.client?.drive,
+    queryFn: async () => {
+      if (!window.gapi?.client?.drive) return [];
+      try {
+        return await driveApi.getFavoriteFiles();
+      } catch (error) {
+        console.warn('Favorite files not available:', error);
+        return [];
+      }
+    },
+    enabled: true,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }
@@ -74,8 +100,16 @@ export function useFavoriteFiles() {
 export function useStorageQuota() {
   return useQuery({
     queryKey: ['storageQuota'],
-    queryFn: () => driveApi.getStorageQuota(),
-    enabled: !!window.gapi?.client?.drive,
+    queryFn: async () => {
+      if (!window.gapi?.client?.drive) return { usage: 0, limit: 15000000000 };
+      try {
+        return await driveApi.getStorageQuota();
+      } catch (error) {
+        console.warn('Storage quota not available:', error);
+        return { usage: 0, limit: 15000000000 };
+      }
+    },
+    enabled: true,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 }

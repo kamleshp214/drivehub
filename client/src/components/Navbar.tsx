@@ -3,13 +3,17 @@ import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useDarkMode } from '@/hooks/useDarkMode';
-import { Cloud, Menu, Search, Moon, Sun, X } from 'lucide-react';
+import GoogleAuth from '@/components/GoogleAuth';
+import { Cloud, Menu, Search, Moon, Sun, X, ExternalLink } from 'lucide-react';
+import { FaGithub, FaLinkedin } from 'react-icons/fa';
 
 interface NavbarProps {
   onSearch?: (searchTerm: string) => void;
+  isAuthenticated?: boolean;
+  onAuthChange?: (isAuthenticated: boolean) => void;
 }
 
-export default function Navbar({ onSearch }: NavbarProps) {
+export default function Navbar({ onSearch, isAuthenticated, onAuthChange }: NavbarProps) {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -45,13 +49,13 @@ export default function Navbar({ onSearch }: NavbarProps) {
           <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => (
               <Link key={item.name} href={item.href}>
-                <a className={`font-medium transition-colors ${
+                <span className={`font-medium transition-colors cursor-pointer ${
                   item.current
                     ? 'text-google-blue'
                     : 'text-gray-700 dark:text-gray-300 hover:text-google-blue dark:hover:text-google-blue'
                 }`}>
                   {item.name}
-                </a>
+                </span>
               </Link>
             ))}
           </div>
@@ -74,6 +78,11 @@ export default function Navbar({ onSearch }: NavbarProps) {
 
           {/* Right side actions */}
           <div className="flex items-center space-x-3">
+            {/* Google Auth */}
+            {isAuthenticated && onAuthChange && (
+              <GoogleAuth onAuthChange={onAuthChange} />
+            )}
+
             {/* Dark mode toggle */}
             <Button
               variant="ghost"
@@ -132,8 +141,8 @@ export default function Navbar({ onSearch }: NavbarProps) {
           <div className="px-4 py-3 space-y-3">
             {navigation.map((item) => (
               <Link key={item.name} href={item.href}>
-                <a 
-                  className={`block py-2 font-medium ${
+                <span 
+                  className={`block py-2 font-medium cursor-pointer ${
                     item.current
                       ? 'text-google-blue'
                       : 'text-gray-700 dark:text-gray-300 hover:text-google-blue dark:hover:text-google-blue'
@@ -141,9 +150,38 @@ export default function Navbar({ onSearch }: NavbarProps) {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}
-                </a>
+                </span>
               </Link>
             ))}
+            
+            {/* Social Links */}
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
+              <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Connect</p>
+              <div className="flex space-x-4">
+                <a
+                  href="https://github.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-google-blue dark:hover:text-google-blue transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <FaGithub size={20} />
+                  <span className="text-sm">GitHub</span>
+                  <ExternalLink size={14} />
+                </a>
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-google-blue dark:hover:text-google-blue transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <FaLinkedin size={20} />
+                  <span className="text-sm">LinkedIn</span>
+                  <ExternalLink size={14} />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       )}

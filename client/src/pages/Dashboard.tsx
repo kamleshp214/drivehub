@@ -77,13 +77,14 @@ export default function Dashboard() {
         {/* Search and Filters Bar */}
         <div className="mb-8 space-y-4">
           {/* Filters and View Toggle */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-center lg:space-y-0">
             <div className="flex flex-wrap gap-2">
               {filterButtons.map((button) => (
                 <Button
                   key={button.key}
                   variant={button.active ? 'default' : 'outline'}
-                  className={button.active ? 'bg-google-blue hover:bg-google-blue-dark' : ''}
+                  size="sm"
+                  className={`${button.active ? 'bg-google-blue hover:bg-google-blue-dark' : ''} text-xs sm:text-sm`}
                   onClick={() => setFilterBy(button.key as FilterOption)}
                 >
                   {button.label}
@@ -91,19 +92,20 @@ export default function Dashboard() {
               ))}
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-between sm:justify-start space-x-3">
               {/* Sort Dropdown */}
-              <div className="relative">
+              <div className="relative flex-1 sm:flex-none">
                 <Button
                   variant="outline"
-                  className="flex items-center space-x-2"
+                  size="sm"
+                  className="flex items-center space-x-2 w-full sm:w-auto justify-center"
                   onClick={() => setShowSortDropdown(!showSortDropdown)}
                 >
                   <SortAsc size={16} />
                   <span className="text-sm font-medium">Sort</span>
                 </Button>
                 {showSortDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-10">
+                  <div className="absolute left-0 right-0 sm:right-0 sm:left-auto mt-2 w-full sm:w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-50">
                     <div className="py-1">
                       {[
                         { value: 'name', label: 'Name' },
@@ -113,7 +115,7 @@ export default function Dashboard() {
                       ].map((option) => (
                         <button
                           key={option.value}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="w-full text-left px-4 py-3 sm:py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                           onClick={() => {
                             setSortBy(option.value as SortOption);
                             setShowSortDropdown(false);
@@ -134,6 +136,7 @@ export default function Dashboard() {
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   className={`p-2 ${viewMode === 'grid' ? 'bg-white dark:bg-gray-600 text-google-blue shadow-sm' : ''}`}
                   onClick={() => setViewMode('grid')}
+                  title="Grid view"
                 >
                   <Grid size={16} />
                 </Button>
@@ -142,6 +145,7 @@ export default function Dashboard() {
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   className={`p-2 ${viewMode === 'list' ? 'bg-white dark:bg-gray-600 text-google-blue shadow-sm' : ''}`}
                   onClick={() => setViewMode('list')}
+                  title="List view"
                 >
                   <List size={16} />
                 </Button>
@@ -152,21 +156,21 @@ export default function Dashboard() {
 
         {/* File Display */}
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {[...Array(12)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 animate-pulse">
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 animate-pulse">
                 <div className="flex flex-col items-center space-y-3">
-                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
                   <div className="w-full space-y-2">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mx-auto"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <div className="h-2 sm:h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mx-auto"></div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {files.map((file) => (
               <FileCard
                 key={file.id}
