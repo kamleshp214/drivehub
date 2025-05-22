@@ -1,0 +1,201 @@
+Below is a detailed prompt for Replit AI to create the DriveHub frontend-only website using React and Tailwind CSS, with Google Drive API integration. It specifies using .js files (not .tsx), excludes Google OAuth setup (as you'll handle it), and avoids mock data, focusing only on the necessary components and functionality.
+
+Replit AI Prompt for DriveHub
+Project Name: DriveHub
+
+Objective: Build a frontend-only website using React (with .js files, not .tsx) and Tailwind CSS that integrates with Google Drive using the Google Drive API (v3) for secure file access and management. The site will allow users to view, manage, and preview files (especially resumes and documents) stored in Google Drive. It must be fully responsive, optimized for mobile, and require no backend, making it fast and free to host on static platforms like Replit, GitHub Pages, Netlify, or Vercel. I will handle Google OAuth 2.0 authentication setup myself, so do not include authentication code or related libraries. Focus only on the file management, UI, and Google Drive API integration.
+
+Core Requirements
+Technology Stack:
+Use React with hooks for state management, in .js files (not .tsx).
+Use Tailwind CSS for responsive, utility-first styling.
+Use react-router-dom for navigation between views.
+Use react-query for managing Google Drive API requests and caching.
+Use react-toastify for client-side notifications.
+Use Google Drive API (v3) for file operations (list, upload, download, share, delete).
+Optionally use Google Picker API for enhanced file selection UI.
+All code must be client-side, with no backend or server-side logic.
+Avoid using mock data; assume Google Drive API will provide real file data.
+File Structure:
+Create the following structure in src/:
+components/: Reusable components (e.g., Navbar, FileCard, FilePreviewModal).
+pages/: Page components (e.g., Home, FileList, FilePreview).
+utils/: Helper functions for Google Drive API calls.
+Use .js files for all JavaScript/React code, not .tsx.
+Core Features:
+File Listing and Organization:
+Fetch and display files/folders from Google Drive using the Drive API (v3).
+Prioritize document types (PDFs, Word, images) for resumes and similar files.
+Organize files into categories (e.g., "Resumes," "Cover Letters") based on folder names or metadata.
+Add a search bar for client-side filtering by file name or keyword.
+Include filters to sort files by date, name, or type (e.g., "PDF only").
+Create a "Favorites" section for starred files (use Drive API’s starred property).
+Show a "Recent Files" section for recently modified files (use modifiedTime).
+File Preview and Management:
+Preview images directly in the UI using <img> tags with Drive API file URLs.
+Use Google Docs Viewer (https://docs.google.com/gview?url=<file-url>&embedded=true) for PDF and document previews in an iframe.
+Provide download links for files that cannot be previewed inline.
+Implement file uploads to Google Drive using Drive API (multipart upload for files).
+Allow generating shareable links for files via Drive API.
+Add a delete option with a confirmation dialog to prevent accidental deletions.
+Additional Features:
+Implement a dark mode toggle using Tailwind’s dark: classes.
+Add client-side notifications using react-toastify for actions (e.g., upload success, deletion).
+Enable drag-and-drop file uploads using React’s drag-and-drop events.
+UI and Mobile Considerations:
+Navigation:
+Use a hamburger menu for mobile and a standard navbar for desktop.
+Ensure buttons/links are tap-friendly (min 44x44px) for mobile.
+File Display:
+Provide grid view (thumbnails) and list view (rows), with a toggle button.
+Each file entry should show an icon, name, and detail (e.g., "Last edited: Oct 10").
+File Preview:
+Display previews in a full-screen modal on mobile, or a centered modal on desktop.
+Ensure previews are zoomable/scrollable for readability on small screens.
+Upload and Management:
+Add a floating action button (FAB) with a plus icon for uploads.
+Use modal dialogs for delete/share actions to confirm user intent.
+Search and Filters:
+Place a search bar at the top, expandable on mobile (e.g., tap to show).
+Add a filter button (funnel icon) that opens a dropdown/modal with sort options (date, name, type).
+Design:
+Use Tailwind CSS for a clean, responsive layout that adapts to all screen sizes.
+Add smooth transitions/animations (e.g., fade-ins for modals) for polish.
+Technical Notes:
+Assume I will provide the Google Drive API access token (from my OAuth setup) to the app via a global variable or context (e.g., window.gapi or a React context).
+Use gapi.client.drive for Google Drive API calls (loaded via <script src="https://apis.google.com/js/api.js"></script>).
+Optimize API calls with react-query for caching and rate limit handling.
+Securely manage API keys via environment variables (e.g., .env with REACT_APP_GOOGLE_API_KEY).
+Ensure the app is deployable on static hosting (e.g., Replit, Netlify, Vercel).
+Implementation Details
+Project Setup:
+Initialize a React project with Tailwind CSS configured.
+Install dependencies: react-router-dom, react-query, react-toastify.
+Set up routing for / (Home), /files (FileList), /file/:id (FilePreview).
+Configure Tailwind CSS with dark mode support (darkMode: 'class' in tailwind.config.js).
+File Listing (src/pages/FileList.js):
+Fetch files using gapi.client.drive.files.list with fields: id, name, mimeType, modifiedTime, starred.
+Display files in grid/list views, toggled via a button.
+Implement client-side search (filter by name) and sort (by date, name, type).
+Show "Favorites" (filter starred=true) and "Recent Files" (sort by modifiedTime).
+Categorize files based on parent folder names or mimeType.
+File Preview and Management (src/pages/FilePreview.js, src/components/FilePreviewModal.js):
+Fetch file metadata using gapi.client.drive.files.get with id from URL params.
+Preview images with <img src="https://drive.google.com/uc?export=view&id=<file-id>">.
+Preview documents/PDFs in an iframe using Google Docs Viewer.
+Add buttons for download (webContentLink), share (generate link via gapi.client.drive.permissions.create), and delete (gapi.client.drive.files.delete).
+Use a modal for previews on mobile, with zoom/scroll support.
+File Upload (src/components/FileUpload.js):
+Create a floating action button (FAB) for uploads.
+Support drag-and-drop uploads using React’s onDrop and onDragOver events.
+Upload files to Drive using gapi.client.request with multipart upload (metadata + file content).
+Show success/error notifications via react-toastify.
+UI Enhancements:
+Add a dark mode toggle button in the navbar, using Tailwind’s dark: classes.
+Implement a responsive navbar with a hamburger menu for mobile (use Tailwind’s sm:, md: breakpoints).
+Ensure modals (for previews, delete confirmation) are accessible and mobile-friendly.
+Add animations (e.g., transition-opacity for modals) using Tailwind classes.
+Utilities (src/utils/driveApi.js):
+Create helper functions for Drive API calls (e.g., listFiles, uploadFile, getFile, deleteFile, createShareLink).
+Use react-query to cache API responses and handle loading states.
+Success Criteria
+The app must function entirely on the frontend, using Google Drive API for file operations.
+It should load quickly and handle file listing, previews, and management seamlessly.
+The UI must be intuitive, responsive, and optimized for mobile (e.g., tap-friendly buttons, scrollable previews).
+The app must be deployable on a free static host (e.g., Replit’s static hosting).
+Additional Notes
+Do not include Google OAuth 2.0 setup or google-auth-library. Assume I’ll provide a valid access token via gapi.auth2 or a context.
+Load Google API client via <script src="https://apis.google.com/js/api.js"></script> in public/index.html.
+Use environment variables for API keys (e.g., REACT_APP_GOOGLE_API_KEY).
+Avoid mock data; all file data should come from Drive API responses.
+Ensure all files are .js (e.g., App.js, FileList.js, not .tsx).
+Optimize for Replit’s environment (e.g., use CDN scripts, avoid local file I/O).
+Example File Structure
+text
+
+Copy
+drivehub/
+├── public/
+│   ├── index.html
+├── src/
+│   ├── components/
+│   │   ├── Navbar.js
+│   │   ├── FileCard.js
+│   │   ├── FilePreviewModal.js
+│   │   ├── FileUpload.js
+│   ├── pages/
+│   │   ├── Home.js
+│   │   ├── FileList.js
+│   │   ├── FilePreview.js
+│   ├── utils/
+│   │   ├── driveApi.js
+│   ├── index.css
+│   ├── App.js
+│   ├── index.js
+├── tailwind.config.js
+├── postcss.config.js
+├── .env
+├── package.json
+Sample Code Snippet (for reference, not exhaustive)
+src/App.js:
+
+js
+
+Copy
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Home from './pages/Home';
+import FileList from './pages/FileList';
+import FilePreview from './pages/FilePreview';
+import Navbar from './components/Navbar';
+
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/files" element={<FileList />} />
+            <Route path="/file/:id" element={<FilePreview />} />
+          </Routes>
+          <ToastContainer />
+        </div>
+      </Router>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
+src/index.css:
+
+css
+
+Copy
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+tailwind.config.js:
+
+js
+
+Copy
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/**/*.{js,jsx}'],
+  darkMode: 'class',
+  theme: { extend: {} },
+  plugins: [],
+};
+Final Notes:
+
+Generate complete, working code for all components, pages, and utilities as .js files.
+Ensure Tailwind CSS is properly configured with @tailwindcss/postcss.
+Focus on Google Drive API integration, responsive UI, and mobile optimization.
+Do not include authentication code or mock data.
+Test the app in Replit’s browser environment to ensure compatibility.
